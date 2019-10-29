@@ -208,6 +208,23 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+
+			<plugin>
+				<groupId>jp.igapyon.diary.igapyonv3.plugin</groupId>
+				<artifactId>igapyonv3-maven-plugin</artifactId>
+				<version>1.2.3</version>
+				<configuration>
+					<basedir>${project.basedir}</basedir>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
