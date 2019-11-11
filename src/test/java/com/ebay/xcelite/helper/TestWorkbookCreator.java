@@ -233,7 +233,6 @@ public class TestWorkbookCreator {
         Row row = sheet.createRow(rowIdx);
         for (short colIdx = 0; colIdx < columnNames.length; colIdx++) {
             Cell cell = row.createCell(colIdx);
-            cell.setCellType(CellType.STRING);
             cell.setCellValue(columnNames[colIdx]);
         }
         return row;

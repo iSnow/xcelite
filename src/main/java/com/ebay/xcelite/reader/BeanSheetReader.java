@@ -278,7 +278,8 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     @Override
     @SneakyThrows
     T getNewObject(){
-        return type.newInstance();
+        return type.getDeclaredConstructor(new Class[0]).newInstance(null);
+        //return type.newInstance();
     }
 
     private class ColumnsMapper {
