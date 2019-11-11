@@ -21,6 +21,7 @@ import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.annotations.Row;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
+import io.github.classgraph.*;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
@@ -29,9 +30,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.of;
+import java.util.Optional;
+
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+//import static org.reflections.ReflectionUtils.getAllFields;
+//import static org.reflections.ReflectionUtils.withAnnotation;
 
 /**
  * Class description...
@@ -64,15 +68,53 @@ public class ColumnsExtractor {
         }
     }
 
+    /*
+    private ClassInfo getScanResult(Class<?> type) {
+        String whiteList = type.getPackageName();
+        ScanResult scanResult = new ClassGraph()
+                    .verbose()
+                    .enableAllInfo()
+                    .whitelistPackages(whiteList)
+                    .scan();
+        String tName = type.getCanonicalName();
+        ClassInfo classInfo = scanResult.getClassInfo(tName);
+        return classInfo;
+    }
+
+    private Col getAnnotationValue(String fieldName, String colName, AnnotationInfo annotationInfo) {
+        String val = annotationInfo
+                .getDefaultParameterValues()
+                .getValue(colName)
+                .toString();
+        if (null == val)
+            val = fieldName;
+        return new Col(fieldName, val);
+    }
+
+     */
+    private Col getAnnotationValue(Column annotation, Field columnField) {
+        Col col = Optional.of(annotation)
+                .filter(column -> !column.name().isEmpty())
+                .map(column -> new Col(column.name(), columnField.getName()))
+                .orElse(new Col(columnField.getName(), columnField.getName()));
+        return col;
+    }
+
     @SuppressWarnings("unchecked")
     public void extract() {
+        /*ClassInfo info = getScanResult(type);
+        FieldInfoList fieldInfos = info.getFieldInfo().filter((f) -> {
+            if (null == f)
+                return false;
+            return f.hasAnnotation(Column.class.getCanonicalName());
+        });
+        System.out.println(fieldInfos);
+        */
         getAllFields(type, withAnnotation(Column.class))
             .forEach(columnField -> {
+        //formFields.forEach(columnField -> {
                 Column annotation = columnField.getAnnotation(Column.class);
-                Col col = of(annotation)
-                        .filter(column -> !column.name().isEmpty())
-                        .map(column -> new Col(column.name(), columnField.getName()))
-                        .orElse(new Col(columnField.getName(), columnField.getName()));
+                Col col = getAnnotationValue(annotation, columnField);
 
                 if (annotation.ignoreType()) {
                     col.setType(String.class);
